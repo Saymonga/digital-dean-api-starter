@@ -10,3 +10,4 @@ htmlcov/
 .env
 *.pem
 *.key
+*.egg-info/

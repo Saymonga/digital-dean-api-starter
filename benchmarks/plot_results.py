@@ -1,5 +1,4 @@
-
-"""Побудова графіків за фактичними результатами бенчмарку."""
+"""Create charts for Practice 03 asymmetric cryptography benchmark."""
 
 import json
 from pathlib import Path
@@ -8,108 +7,97 @@ import matplotlib.pyplot as plt
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_PATH = BASE_DIR / "results" / "practice-02" / "report.json"
-OUTPUT_DIR = BASE_DIR / "results" / "practice-02"
+REPORT_PATH = BASE_DIR / "results" / "practice-03" / "report.json"
+OUTPUT_DIR = BASE_DIR / "results" / "practice-03"
 
 
 def main():
     report = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
     results = report["results"]
 
-    algorithms = (
-        "AES-128-GCM",
-        "AES-256-GCM",
-        "ChaCha20-Poly1305",
+    profiles = (
+        "rsa2048-oaep",
+        "rsa3072-oaep",
+        "rsa3072-oaep-aes256gcm",
+        "hpke-x25519-aes256gcm",
+        "hpke-p256-aes256gcm",
     )
 
-    sizes = (1024, 65536, 1048576)
+    # Chart 1: encryption and decryption time.
+    fig, ax = plt.subplots(figsize=(13, 7))
 
-    # Графік 1. Пропускна здатність для шести комбінацій.
-    fig, ax = plt.subplots(figsize=(12, 7))
+    for profile in profiles:
+        for operation in ("encrypt", "decrypt"):
+            selected = [
+                row for row in results
+                if row["profile"] == profile
+                and row["operation"] == operation
+            ]
+            selected.sort(key=lambda row: row["payload_bytes"])
 
-    labels = []
-    values = []
+            if not selected:
+                continue
 
-    for backend in ("cryptography", "pycryptodome"):
-        for algorithm in algorithms:
-            for size in sizes:
-                row = next(
-                    r for r in results
-                    if r["backend"] == backend
-                    and r["algorithm"] == algorithm
-                    and r["size_bytes"] == size
-                    and r["operation"] == "encrypt"
-                )
+            x = [row["payload_bytes"] / 1024 for row in selected]
+            y = [row["median_ns"] / 1_000_000 for row in selected]
 
-                labels.append(
-                    f"{backend}\n{algorithm}\n{size // 1024} KiB"
-                )
-                values.append(row["throughput_mib_s"])
-
-    ax.bar(range(len(values)), values)
-    ax.set_xticks(range(len(labels)))
-    ax.set_xticklabels(labels, rotation=55, ha="right", fontsize=8)
-    ax.set_ylabel("Throughput (MiB/s)")
-    ax.set_title("Encryption throughput comparison")
-    ax.grid(axis="y", alpha=0.3)
-
-    fig.tight_layout()
-    fig.savefig(
-        OUTPUT_DIR / "chart_throughput.png",
-        dpi=200,
-    )
-    plt.close(fig)
-
-    # Графік 2. Час шифрування та розшифрування залежно від розміру.
-    fig, ax = plt.subplots(figsize=(12, 7))
-
-    for backend in ("cryptography", "pycryptodome"):
-        for algorithm in algorithms:
-            for operation in ("encrypt", "decrypt"):
-                selected = [
-                    r for r in results
-                    if r["backend"] == backend
-                    and r["algorithm"] == algorithm
-                    and r["operation"] == operation
-                ]
-
-                selected.sort(key=lambda r: r["size_bytes"])
-
-                x = [
-                    r["size_bytes"] / 1024
-                    for r in selected
-                ]
-                y = [
-                    r["median_ns"] / 1_000_000
-                    for r in selected
-                ]
-
-                ax.plot(
-                    x,
-                    y,
-                    marker="o",
-                    label=f"{backend} | {algorithm} | {operation}",
-                )
+            ax.plot(
+                x,
+                y,
+                marker="o",
+                label=f"{profile} | {operation}",
+            )
 
     ax.set_xscale("log", base=2)
-    ax.set_xlabel("Data size (KiB)")
+    ax.set_xlabel("Payload size (KiB)")
     ax.set_ylabel("Median time (ms)")
-    ax.set_title("Encryption and decryption time")
-    ax.set_xticks([1, 64, 1024])
-    ax.set_xticklabels(["1", "64", "1024"])
+    ax.set_title("Asymmetric encryption and decryption time")
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=7, loc="upper left")
+    ax.legend(fontsize=7, loc="best")
 
     fig.tight_layout()
-    fig.savefig(
-        OUTPUT_DIR / "chart_operation_time.png",
-        dpi=200,
-    )
+    fig.savefig(OUTPUT_DIR / "chart_operation_time.png", dpi=200)
     plt.close(fig)
 
-    print("Графіки успішно створено:")
-    print(OUTPUT_DIR / "chart_throughput.png")
+    # Chart 2: ciphertext size compared with plaintext size.
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for profile in profiles:
+        selected = [
+            row for row in results
+            if row["profile"] == profile
+            and row["operation"] == "encrypt"
+        ]
+        selected.sort(key=lambda row: row["payload_bytes"])
+
+        if not selected:
+            continue
+
+        x = [row["payload_bytes"] / 1024 for row in selected]
+        y = [row["ciphertext_bytes"] / 1024 for row in selected]
+
+        ax.plot(
+            x,
+            y,
+            marker="o",
+            label=profile,
+        )
+
+    ax.set_xscale("log", base=2)
+    ax.set_yscale("log", base=2)
+    ax.set_xlabel("Plaintext size (KiB)")
+    ax.set_ylabel("Ciphertext size (KiB)")
+    ax.set_title("Ciphertext size by cryptographic profile")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=8, loc="best")
+
+    fig.tight_layout()
+    fig.savefig(OUTPUT_DIR / "chart_ciphertext_size.png", dpi=200)
+    plt.close(fig)
+
+    print("Charts successfully created:")
     print(OUTPUT_DIR / "chart_operation_time.png")
+    print(OUTPUT_DIR / "chart_ciphertext_size.png")
 
 
 if __name__ == "__main__":

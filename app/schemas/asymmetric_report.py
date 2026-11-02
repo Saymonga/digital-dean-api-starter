@@ -155,7 +155,9 @@ def _validate_timestamp(value: str) -> None:
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as exc:
-        raise ValueError("created_at_utc must be a valid ISO 8601 timestamp") from exc
+        raise ValueError(
+            "created_at_utc must be a valid ISO 8601 timestamp"
+        ) from exc
 
     if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
         raise ValueError("created_at_utc must use UTC")
@@ -177,7 +179,9 @@ def _validate_key_generation(report: BenchmarkReport) -> None:
     actual_profiles = [item.key_profile for item in report.key_generation]
 
     if len(set(actual_profiles)) != 4 or set(actual_profiles) != expected_profiles:
-        raise ValueError("key_generation must contain exactly four unique key profiles")
+        raise ValueError(
+            "key_generation must contain exactly four unique key profiles"
+        )
 
     for item in report.key_generation:
         if item.runs != 5:
@@ -211,7 +215,9 @@ def _validate_results(report: BenchmarkReport) -> None:
             raise ValueError(f"incorrect payload size for profile {item.profile}")
 
         if item.series != 5 or item.operations_per_series != 20:
-            raise ValueError("each result must contain five series of twenty operations")
+            raise ValueError(
+                "each result must contain five series of twenty operations"
+            )
 
         expected_size = _expected_ciphertext_bytes(
             item.profile,
@@ -249,7 +255,8 @@ def _validate_results(report: BenchmarkReport) -> None:
         missing = expected - actual
         extra = actual - expected
         raise ValueError(
-            f"benchmark result coverage mismatch; missing={missing}, extra={extra}"
+            f"benchmark result coverage mismatch; "
+            f"missing={missing}, extra={extra}"
         )
 
 
@@ -257,7 +264,11 @@ def _validate_checks(report: BenchmarkReport) -> None:
     expected = set()
 
     for profile in PROFILE_CONFIG:
-        names = RSA_CHECK_NAMES if profile.startswith("rsa") else CHECK_NAMES
+        names = set(CHECK_NAMES)
+
+        if profile in ("rsa2048-oaep", "rsa3072-oaep"):
+            names.add("oaep_boundary")
+
         for name in names:
             expected.add((profile, name))
 
@@ -290,6 +301,5 @@ def validate_complete_report(data: object) -> BenchmarkReport:
     _validate_results(report)
     _validate_checks(report)
 
-    # Failed checks remain in the report as evidence.
-    # The validator does not silently change their passed values.
+    # Failed checks remain visible in the report.
     return report

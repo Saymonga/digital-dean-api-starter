@@ -1,0 +1,432 @@
+{
+  "schema_version": 1,
+  "experiment": {
+    "series": 5,
+    "operations_per_series": 20,
+    "warmup": 10,
+    "keygen_runs": 5,
+    "direct_payload_bytes": 64,
+    "hybrid_sizes_bytes": [
+      1024,
+      65536,
+      1048576
+    ],
+    "source_commit": "e0963e0338ffc5991c2a3702b44021492cfba7f4",
+    "created_at_utc": "2026-11-02T23:00:10.644686Z"
+  },
+  "environment": {
+    "python": "3.14.3",
+    "cryptography": "48.0.1",
+    "openssl": "OpenSSL 4.0.1 9 Jun 2026",
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD"
+  },
+  "key_generation": [
+    {
+      "key_profile": "rsa-2048",
+      "runs": 5,
+      "median_ns": 38180200.0,
+      "iqr_ns": 11771900.0,
+      "public_key_der_bytes": 294
+    },
+    {
+      "key_profile": "rsa-3072",
+      "runs": 5,
+      "median_ns": 145878900.0,
+      "iqr_ns": 102649100.0,
+      "public_key_der_bytes": 422
+    },
+    {
+      "key_profile": "x25519",
+      "runs": 5,
+      "median_ns": 46400.0,
+      "iqr_ns": 1800.0,
+      "public_key_der_bytes": 44
+    },
+    {
+      "key_profile": "p256",
+      "runs": 5,
+      "median_ns": 24900.0,
+      "iqr_ns": 500.0,
+      "public_key_der_bytes": 91
+    }
+  ],
+  "results": [
+    {
+      "profile": "rsa2048-oaep",
+      "group": "direct",
+      "operation": "encrypt",
+      "payload_bytes": 64,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 79755.0,
+      "iqr_ns": 1205.0,
+      "ciphertext_bytes": 256,
+      "throughput_mib_s": null
+    },
+    {
+      "profile": "rsa2048-oaep",
+      "group": "direct",
+      "operation": "decrypt",
+      "payload_bytes": 64,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 755150.0,
+      "iqr_ns": 21065.0,
+      "ciphertext_bytes": 256,
+      "throughput_mib_s": null
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "group": "direct",
+      "operation": "encrypt",
+      "payload_bytes": 64,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 64480.0,
+      "iqr_ns": 2540.0,
+      "ciphertext_bytes": 384,
+      "throughput_mib_s": null
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "group": "direct",
+      "operation": "decrypt",
+      "payload_bytes": 64,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 2128860.0,
+      "iqr_ns": 5165.0,
+      "ciphertext_bytes": 384,
+      "throughput_mib_s": null
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 1024,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 68705.0,
+      "iqr_ns": 2470.0,
+      "ciphertext_bytes": 1436,
+      "throughput_mib_s": 14.213849064842442
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 1024,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 2152770.0,
+      "iqr_ns": 29315.0,
+      "ciphertext_bytes": 1436,
+      "throughput_mib_s": 0.45363067118177974
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 65536,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 119530.0,
+      "iqr_ns": 7130.0,
+      "ciphertext_bytes": 65948,
+      "throughput_mib_s": 522.8812850330461
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 65536,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 2191485.0,
+      "iqr_ns": 61450.0,
+      "ciphertext_bytes": 65948,
+      "throughput_mib_s": 28.519474237788533
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 1048576,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 833545.0,
+      "iqr_ns": 8595.0,
+      "ciphertext_bytes": 1048988,
+      "throughput_mib_s": 1199.6952773995406
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 1048576,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 2928955.0,
+      "iqr_ns": 9560.0,
+      "ciphertext_bytes": 1048988,
+      "throughput_mib_s": 341.41869711210995
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 1024,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 169955.0,
+      "iqr_ns": 7770.0,
+      "ciphertext_bytes": 1072,
+      "throughput_mib_s": 5.746006295784178
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 1024,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 114475.0,
+      "iqr_ns": 2285.0,
+      "ciphertext_bytes": 1072,
+      "throughput_mib_s": 8.530792749508626
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 65536,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 167015.0,
+      "iqr_ns": 1730.0,
+      "ciphertext_bytes": 65584,
+      "throughput_mib_s": 374.2178846211418
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 65536,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 117360.0,
+      "iqr_ns": 3825.0,
+      "ciphertext_bytes": 65584,
+      "throughput_mib_s": 532.5494205862304
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 1048576,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 893735.0,
+      "iqr_ns": 57610.0,
+      "ciphertext_bytes": 1048624,
+      "throughput_mib_s": 1118.8998976206592
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 1048576,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 582095.0,
+      "iqr_ns": 8540.0,
+      "ciphertext_bytes": 1048624,
+      "throughput_mib_s": 1717.932639861191
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 1024,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 182895.0,
+      "iqr_ns": 17275.0,
+      "ciphertext_bytes": 1105,
+      "throughput_mib_s": 5.339470734574483
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 1024,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 160595.0,
+      "iqr_ns": 11105.0,
+      "ciphertext_bytes": 1105,
+      "throughput_mib_s": 6.08090226968461
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 65536,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 189305.0,
+      "iqr_ns": 3920.0,
+      "ciphertext_bytes": 65617,
+      "throughput_mib_s": 330.15504080716306
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 65536,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 173530.0,
+      "iqr_ns": 6225.0,
+      "ciphertext_bytes": 65617,
+      "throughput_mib_s": 360.1682706160318
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "group": "hybrid",
+      "operation": "encrypt",
+      "payload_bytes": 1048576,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 949110.0,
+      "iqr_ns": 27015.0,
+      "ciphertext_bytes": 1048657,
+      "throughput_mib_s": 1053.6186532646375
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "group": "hybrid",
+      "operation": "decrypt",
+      "payload_bytes": 1048576,
+      "series": 5,
+      "operations_per_series": 20,
+      "median_ns": 625170.0,
+      "iqr_ns": 6390.0,
+      "ciphertext_bytes": 1048657,
+      "throughput_mib_s": 1599.564918342211
+    }
+  ],
+  "checks": [
+    {
+      "profile": "rsa2048-oaep",
+      "name": "roundtrip",
+      "passed": true
+    },
+    {
+      "profile": "rsa2048-oaep",
+      "name": "wrong_key",
+      "passed": true
+    },
+    {
+      "profile": "rsa2048-oaep",
+      "name": "tamper",
+      "passed": true
+    },
+    {
+      "profile": "rsa2048-oaep",
+      "name": "wrong_context",
+      "passed": true
+    },
+    {
+      "profile": "rsa2048-oaep",
+      "name": "oaep_boundary",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "name": "roundtrip",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "name": "wrong_key",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "name": "tamper",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "name": "wrong_context",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep",
+      "name": "oaep_boundary",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "name": "roundtrip",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "name": "wrong_key",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "name": "tamper",
+      "passed": true
+    },
+    {
+      "profile": "rsa3072-oaep-aes256gcm",
+      "name": "wrong_context",
+      "passed": true
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "name": "roundtrip",
+      "passed": true
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "name": "wrong_key",
+      "passed": true
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "name": "tamper",
+      "passed": true
+    },
+    {
+      "profile": "hpke-x25519-aes256gcm",
+      "name": "wrong_context",
+      "passed": true
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "name": "roundtrip",
+      "passed": true
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "name": "wrong_key",
+      "passed": true
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "name": "tamper",
+      "passed": true
+    },
+    {
+      "profile": "hpke-p256-aes256gcm",
+      "name": "wrong_context",
+      "passed": true
+    }
+  ]
+}

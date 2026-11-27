@@ -1,56 +1,133 @@
-"""Student task: persistent account operations on separate short connections."""
+
+"""SQLite repository for user accounts."""
+import sqlite3
 from pathlib import Path
 
-from app.db.connection import open_database, write_transaction
+from app.db.connection import DB_PATH, open_database, write_transaction
 from app.schemas.user_account import UserCreate, UserPublic
 from app.security.passwords import make_password_record, verify_password
 
 
-class UserNotFound(Exception):
-    """No account with the requested id."""
-
-
 class UserConflict(Exception):
-    """The canonical login or email is already used."""
+    """Login or email already exists."""
+
+
+class UserNotFound(Exception):
+    """User does not exist."""
 
 
 class UserReferenced(Exception):
-    """Academic records prohibit physical deletion."""
+    """User is referenced by a grade and cannot be deleted."""
 
 
 class UserRepository:
-    def __init__(self, database_path: Path):
+    def __init__(self, database_path: Path = DB_PATH):
         self.database_path = Path(database_path)
 
+    @staticmethod
+    def _public(row: sqlite3.Row) -> UserPublic:
+        return UserPublic(
+            id=row["id"],
+            name=row["name"],
+            email=row["email"],
+            login=row["login"],
+            status_id=row["status_id"],
+        )
+
     def register_user(self, data: UserCreate) -> UserPublic:
-        """TODO: hash, parameterized INSERT, transaction, safe output.
+        password = data.password.get_secret_value()
+        password_record, salt = make_password_record(password)
 
-        Do not assign privileged roles or accept client id/hash/salt fields.
-        Return only id, name, email, login, status_id. Map UNIQUE conflicts to
-        UserConflict; preserve the database on failure. No shared connection.
-        """
-        raise NotImplementedError("TODO: register a persistent user")
+        try:
+            with open_database(self.database_path) as con:
+                with write_transaction(con):
+                    cursor = con.execute(
+                        """
+                        INSERT INTO "user"
+                            (name, email, login, password, salt, status_id)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            data.name,
+                            str(data.email).casefold(),
+                            data.login,
+                            password_record,
+                            salt,
+                            data.status_id,
+                        ),
+                    )
+                    row = con.execute(
+                        """
+                        SELECT id, name, email, login, status_id
+                        FROM "user" WHERE id = ?
+                        """,
+                        (cursor.lastrowid,),
+                    ).fetchone()
+                    return self._public(row)
+        except sqlite3.IntegrityError as exc:
+            if "unique" in str(exc).lower():
+                raise UserConflict("Login or email already exists") from exc
+            raise
 
-    def delete_user(self, user_id: int) -> None:
-        """TODO: DELETE in one transaction; missing -> UserNotFound.
+    def get_user(self, user_id: int) -> UserPublic | None:
+        with open_database(self.database_path) as con:
+            row = con.execute(
+                """
+                SELECT id, name, email, login, status_id
+                FROM "user" WHERE id = ?
+                """,
+                (user_id,),
+            ).fetchone()
+            return self._public(row) if row else None
 
-        A grade reference to this user as student OR teacher -> UserReferenced.
-        Check user existence and grade references inside the SAME write
-        transaction as DELETE; retain FK enforcement as the database backstop.
-        Roll back the whole transaction, including any role cascades. Never
-        manually delete grades to make the account DELETE succeed.
-        """
-        raise NotImplementedError("TODO: delete an unreferenced user")
-
-    def block_user(self, user_id: int) -> UserPublic:
-        """TODO: set status_id=2, preserve other fields; repeat is safe."""
-        raise NotImplementedError("TODO: persist the blocked status")
+    def get_credentials(self, login: str):
+        with open_database(self.database_path) as con:
+            return con.execute(
+                """
+                SELECT id, login, password, salt, status_id
+                FROM "user" WHERE login = ?
+                """,
+                (login,),
+            ).fetchone()
 
     def login(self, login: str, password: str) -> bool:
-        """TODO: parameterized lookup, verify password AND status_id == 1.
+        row = self.get_credentials(login)
+        if row is None or row["status_id"] != 1:
+            return False
+        return verify_password(password, row["password"], row["salt"])
 
-        Unknown login, wrong password, malformed stored record, inactive or
-        blocked user -> False. Do not return the row, account id or secrets.
-        No session or access token is issued by this educational operation.
-        """
-        raise NotImplementedError("TODO: check credentials and active status")
+    def authenticate(self, login: str, password: str) -> bool:
+        return self.login(login, password)
+
+    def block_user(self, user_id: int) -> UserPublic:
+        with open_database(self.database_path) as con:
+            with write_transaction(con):
+                con.execute(
+                    'UPDATE "user" SET status_id = 2 WHERE id = ?',
+                    (user_id,),
+                )
+                row = con.execute(
+                    """
+                    SELECT id, name, email, login, status_id
+                    FROM "user" WHERE id = ?
+                    """,
+                    (user_id,),
+                ).fetchone()
+                if row is None:
+                    raise UserNotFound("User not found")
+                return self._public(row)
+
+    def delete_user(self, user_id: int) -> None:
+        try:
+            with open_database(self.database_path) as con:
+                with write_transaction(con):
+                    cursor = con.execute(
+                        'DELETE FROM "user" WHERE id = ?',
+                        (user_id,),
+                    )
+                    if cursor.rowcount == 0:
+                        raise UserNotFound("User not found")
+        except sqlite3.IntegrityError as exc:
+            if "foreign key" in str(exc).lower():
+                raise UserReferenced("User is referenced") from exc
+            raise

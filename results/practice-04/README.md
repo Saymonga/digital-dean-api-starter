@@ -1,15 +1,25 @@
-# Результати практичної 4
+# Practice 04 - Hashing
 
-Власна реалізація експерименту створює тут:
+## Experiment artifacts
 
-- `raw.csv`: algorithm,mode,payload_bytes,series,repeats,elapsed_ns,ns_per_op;
-- `avalanche.csv`: algorithm,trial,bit_index,digest_bits,flipped_bits,fraction;
-- `report.json`: повний перевірений звіт за схемою версії 1.
+- raw.csv - raw hash performance measurements.
+- avalanche.csv - avalanche effect measurements.
+- report.json - validated experiment report.
+- chart_throughput.png - throughput chart.
+- chart_avalanche.png - avalanche effect chart.
 
-Сирі рядки не замінюють агрегатами. JSON не містить повідомлень, контрольних
-значень реальних документів, ключів, паролів, токенів або локальних шляхів.
-Для недоступного legacy-профілю зберігають статус, а не нульові чи вигадані числа.
+## Experiment summary
 
-Запускати з чистого стану власного Git перед експериментом. `source_commit`
-ідентифікує вже збережений код, який є предком фінального тегу `practice-04`.
-Контрольні приклади в тестах — синтетичні фікстури, а не результати вимірювань.
+- 280 raw performance measurements.
+- 56 aggregated performance results.
+- 700 avalanche trials.
+- 42 correctness checks.
+- Failed checks: 0.
+
+## Reproduction
+
+Run from a clean Git working tree:
+
+    .\.venv\Scripts\python.exe benchmarks\hash_benchmark.py
+
+The source_commit field identifies the source code commit used for the experiment.
